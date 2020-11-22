@@ -65,7 +65,16 @@ def timestring(tleft):
                 valt = str(tleft)+" DAYS AND "+ str(le) + " HRS"
     return valt + "." + str(int(addend*100))
 
+def to_sec(text):
+    text = text.split(":")
+    m = float(text[0])
+    s = float(text[1])
+    
+    ret = s + ( m * 60 )
+    return ret
 
+# System
+system = "Ubuntu 20.04.1 LTS" # EDIT THIS TOO 
 
 # Blender Versions
 BlenderVer = {
@@ -159,13 +168,17 @@ for configuration in configurations:
     ChooseF = configuration[1]
     ChooseT = configuration[2]
     
-    times = []
-    openingtime = []
-    savingtime = []
+    
     for version in BlenderVer:
         if ChooseV == version or ChooseV == "All":
             for filename in BlendFiles:
                 if ChooseF == filename or ChooseF == "All":
+                    
+                    times = []
+                    openingtime = []
+                    savingtime = []
+                    
+                    
                     for t in range(ChooseT):
                         
                         start = datetime.datetime.now()
@@ -204,7 +217,7 @@ for configuration in configurations:
                         
                         
                         openingtime.append(retopen)
-                        savingtime.append(retsaving)
+                        savingtime.append(to_sec(retsaving))
                         
                         # NO RENDERS ABOVE 24 HOURS WILL SHOW THE CORRET TIME
                         
@@ -212,51 +225,159 @@ for configuration in configurations:
                         m = rendTime.microseconds
                         
                         ret = ((s*1000000)+m)/1000000
-                        print (t, "Finished" ,timestring(ret))
+                        print (t+1, "Finished" ,timestring(ret))
                         times.append(ret)
 
-    maxv = 0
-    for i in times:
-        if i > maxv:
-            maxv = i
-            
-    minv = maxv
-    for i in times:
-        if i < minv:
-            minv = i
+                    maxv = 0
+                    for i in times:
+                        if i > maxv:
+                            maxv = i
+                            
+                    minv = maxv
+                    for i in times:
+                        if i < minv:
+                            minv = i
 
-    avat = sum(times)/len(times)
+                    avat = sum(times)/len(times)
 
-    try:
-        odata = open("Data_Times.txt")
-        odata = odata.read()
-    except:
-        odata = ""
-     
-    data = open("Data_Times.txt", "w")
-    data.write(odata+"\n\n")
-    data.write("Blender Version: "+ChooseV+"\n")
-    data.write("Blend File: "+ChooseF+"\n")
-    data.write("System: ["+platform.system()+"] Version: "+platform.version()+"\n\n")
-    data.write("Maximum Time : "+str(timestring(maxv))+"\n")
-    data.write("Avarage Time : "+str(timestring(avat))+"\n")
-    data.write("Minimum Time: "+str(timestring(minv))+"\n\n")
-    for num,  frame in enumerate(times):
-        data.write("Frame "+str(num+1)+" : "+str(timestring(frame))+" Opening Blender Time : "+timestring(openingtime[num])+" Saving Time : "+savingtime[num]+"\n")
-    data.close()
-    
-    
-    # writting to the terminal
-    print("Blender Version: "+ChooseV)
-    print("Blend File: "+ChooseF)
-    print("System: ["+platform.system()+"] Version: "+platform.version())
-    print()
-    print("Maximum Time : "+str(timestring(maxv)))
-    print("Avarage Time : "+str(timestring(avat)))
-    print("Minimum Time: "+str(timestring(minv)))
-    print()
-    for num,  frame in enumerate(times):
-        print("Frame "+str(num+1)+" : "+str(timestring(frame))+" Opening Blender Time : "+timestring(openingtime[num])+" Saving Time : "+savingtime[num])
-    
-    
+                    try:
+                        odata = open("Data_Times.txt")
+                        odata = odata.read()
+                    except:
+                        odata = ""
+                     
+                    data = open("Data_Times.txt", "w")
+                    data.write(odata+"\n\n")
+                    
+                    
+                    dateformat = "%Y/%m/%d"
+                    
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    
+                    data.write("| ")
+                    t = "Blender "+version
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = filename
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = system
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = datetime.datetime.strftime(datetime.datetime.today(), dateformat)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" |\n")
+                    
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    data.write("| Descriptor:          | Minimum              | Average              | Maximum              |\n")
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    
+                    data.write("| ")
+                    t = "Render Time"
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(minv)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(avat)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(maxv)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" |\n")
+                    
+                    
+                    
+                    maxv = 0
+                    for i in openingtime:
+                        if i > maxv:
+                            maxv = i
+                            
+                    minv = maxv
+                    for i in openingtime:
+                        if i < minv:
+                            minv = i
+
+                    avat = sum(openingtime)/len(openingtime)
+                    
+                    
+                    
+                    data.write("| ")
+                    t = "Opening Blender Time"
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(minv)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(avat)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(maxv)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" |\n")
+                    
+                    maxv = 0
+                    for i in savingtime:
+                        if i > maxv:
+                            maxv = i
+                            
+                    minv = maxv
+                    for i in savingtime:
+                        if i < minv:
+                            minv = i
+
+                    avat = sum(savingtime)/len(savingtime)
+                    
+                    
+                    
+                    data.write("| ")
+                    t = "Saving Image Time"
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(minv)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(avat)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" | ")
+                    t = timestring(maxv)
+                    data.write(t[:20]+" "*(20-len(t)))
+                    data.write(" |\n")
+                    
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    data.write("| Frame                | Render Time          | Opening Blender Time | Saving Image Time    |\n")
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    
+                    
+                    for num,  frame in enumerate(times):
+                    
+                        data.write("| ")
+                        t = str(num+1)
+                        data.write(t[:20]+" "*(20-len(t)))
+                        data.write(" | ")
+                        t = timestring(frame)
+                        data.write(t[:20]+" "*(20-len(t)))
+                        data.write(" | ")
+                        t = timestring(openingtime[num])
+                        data.write(t[:20]+" "*(20-len(t)))
+                        data.write(" | ")
+                        t = timestring(savingtime[num])
+                        data.write(t[:20]+" "*(20-len(t)))
+                        data.write(" |\n")
+                    
+                    data.write("+-------------------------------------------------------------------------------------------+\n")
+                    data.close()
+                    
+                    
+                    data = open("Data_Times.txt")
+                    data = data.read()
+                    
+                    data = data.replace(odata, "")
+                    print(data)
+                    
+                    
+                    
+                    
     
