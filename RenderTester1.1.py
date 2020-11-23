@@ -189,7 +189,7 @@ for configuration in configurations:
                         
                         x = r.stdout.readline()[:-1]
                         retopen = 0
-                        retsaving = "Crashed"
+                        retsaving = "00:00.00"
                         while x:
                             
                             if "Fra:" in x and retopen == 0:
@@ -225,20 +225,40 @@ for configuration in configurations:
                         m = rendTime.microseconds
                         
                         ret = ((s*1000000)+m)/1000000
-                        print (t+1, "Finished" ,timestring(ret))
+                        if to_sec(retsaving) == 0:
+                            print (t+1, "Crashed")
+                        else:
+                            print (t+1, "Finished Time:" ,timestring(ret), "Opening:", timestring(retopen), "Saving:", retsaving)
                         times.append(ret)
 
+
+                    copytime = times.copy()
+                    copysave = savingtime.copy()
+                    copyopen = openingtime.copy()
+                    for num, valuex in enumerate(savingtime):
+                        if valuex == 0:
+                            times [num] = 0
+                            openingtime [num] = 0
+                    
+
+                    while 0 in copytime:
+                        copytime.remove (0)
+                    while 0 in copysave:
+                        copysave.remove (0)
+                    while 0 in copyopen:
+                        copyopen.remove (0)
+
                     maxv = 0
-                    for i in times:
+                    for i in copytime:
                         if i > maxv:
                             maxv = i
                             
                     minv = maxv
-                    for i in times:
+                    for i in copytime:
                         if i < minv:
                             minv = i
 
-                    avat = sum(times)/len(times)
+                    avat = sum(copytime)/len(copytime)
 
                     try:
                         odata = open("Data_Times.txt")
@@ -290,16 +310,16 @@ for configuration in configurations:
                     
                     
                     maxv = 0
-                    for i in openingtime:
+                    for i in copyopen:
                         if i > maxv:
                             maxv = i
                             
                     minv = maxv
-                    for i in openingtime:
+                    for i in copyopen:
                         if i < minv:
                             minv = i
 
-                    avat = sum(openingtime)/len(openingtime)
+                    avat = sum(copyopen)/len(copyopen)
                     
                     
                     
@@ -317,17 +337,20 @@ for configuration in configurations:
                     data.write(t[:20]+" "*(20-len(t)))
                     data.write(" |\n")
                     
+                    
+                    
                     maxv = 0
-                    for i in savingtime:
+                    for i in copysave:
                         if i > maxv:
                             maxv = i
                             
                     minv = maxv
-                    for i in savingtime:
+                    for i in copysave:
                         if i < minv:
                             minv = i
 
-                    avat = sum(savingtime)/len(savingtime)
+                    avat = sum(copysave)/len(copysave)
+                    
                     
                     
                     
@@ -357,13 +380,22 @@ for configuration in configurations:
                         t = str(num+1)
                         data.write(t[:20]+" "*(20-len(t)))
                         data.write(" | ")
-                        t = timestring(frame)
+                        if savingtime[num] == 0:
+                            t = "Crashed"
+                        else: 
+                            t = timestring(frame)
                         data.write(t[:20]+" "*(20-len(t)))
                         data.write(" | ")
-                        t = timestring(openingtime[num])
+                        if savingtime[num] == 0:
+                            t = "Crashed"
+                        else: 
+                            t = timestring(openingtime[num])
                         data.write(t[:20]+" "*(20-len(t)))
                         data.write(" | ")
-                        t = timestring(savingtime[num])
+                        if savingtime[num] == 0:
+                            t = "Crashed"
+                        else: 
+                            t = timestring(savingtime[num])
                         data.write(t[:20]+" "*(20-len(t)))
                         data.write(" |\n")
                     
